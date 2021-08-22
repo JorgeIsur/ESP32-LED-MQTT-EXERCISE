@@ -27,7 +27,8 @@ const char* password = "yYYmteq554";  // Aquí debes poner la contraseña de tu 
 //Datos del broker MQTT
 const char* mqtt_server = "18.198.240.106"; // Si estas en una red local, coloca la IP asignada, en caso contrario, coloca la IP publica
 IPAddress server(18,198,240,106);
-const char* tema = "BinOperation/Sic"
+const char* tema = "BinOperation/Sic";
+char* paquete;
 // Objetos
 WiFiClient esp32Client; // Este objeto maneja los datos de conexion WiFi
 PubSubClient client(esp32Client); // Este objeto maneja los datos de conexion al broker
@@ -42,6 +43,7 @@ const int LED4=15;
 bool first_phase_complete=0;
 bool second_phase_complete=0;
 double tempo_n, tempo_l,tempo_lv1,tempo_secuencia_n,tempo_secuencia_l;
+int statusLedPin = 33;
 int contador=1;
 int indice=0;
 int binario = 1;
@@ -63,7 +65,7 @@ void loop(){
         if ((tempo_n-tempo_lv1<first_phase)&&(first_phase_complete==0 && second_phase_complete==0))
         {
             //comprobar que los leds esten apagados:
-            apagarLeds();
+            apagarLeds(LED,LED2,LED3,LED4);
             //Ascendente exclusiva
             actualizaSecuencia(indice);
             //Ascendente aditiva
@@ -78,12 +80,15 @@ void loop(){
             if (first_phase_complete==1)
             {
                 resultado=bitOperation(binario);
-                Serial.println(resultado);
+                itoa(resultado,paquete,10); //para matchear con la función publish.
+                Serial.println(paquete);
             }
             
         }
         if ((tempo_n-tempo_lv1 >second_phase)&&(first_phase_complete==1 && second_phase_complete==0))
         {
+            //COMPROBAR LEDS APAGADOS
+            apagarLeds(LED,LED2,LED3,LED4);
             //Ascendente exclusiva
             actualizaSecuencia(indice);
             //Ascendente aditiva
@@ -170,7 +175,7 @@ int actualizaSecuencia(int indice){
             digitalWrite(LED3,LOW);
             digitalWrite(LED4,HIGH);
         }
-        apagarLeds();
+        apagarLeds(LED,LED2,LED3,LED4);
         return indice++;
         break;
     case 1:
@@ -188,7 +193,7 @@ int actualizaSecuencia(int indice){
         {
             digitalWrite(LED4,HIGH);
         }
-        apagarLeds();
+        apagarLeds(LED,LED2,LED3,LED4);
         return indice++;
         break;
     case 2:
@@ -209,7 +214,7 @@ int actualizaSecuencia(int indice){
             digitalWrite(LED2,LOW);
             digitalWrite(LED,HIGH);
         }
-        apagarLeds();
+        apagarLeds(LED,LED2,LED3,LED4);
         return indice++;
         break;
     case 3:
@@ -227,7 +232,7 @@ int actualizaSecuencia(int indice){
         {
             digitalWrite(LED,HIGH);
         }
-        apagarLeds();
+        apagarLeds(LED,LED2,LED3,LED4);
         return indice++;
         break;
     }
